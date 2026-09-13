@@ -1,4 +1,7 @@
+"use client";
+
 import Image from "next/image";
+import { useEffect, useRef, useState } from "react";
 import { Space_Grotesk, IBM_Plex_Sans, IBM_Plex_Mono } from "next/font/google";
 
 const display = Space_Grotesk({
@@ -16,21 +19,6 @@ const mono = IBM_Plex_Mono({
   weight: ["400", "500"],
   variable: "--font-mono",
 });
-
-function Logo({ size = 20, className = "" }: { size?: number; className?: string }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" className={className}>
-      <path
-        d="M4 5.5C4 4.67 4.67 4 5.5 4h13c.83 0 1.5.67 1.5 1.5v9c0 .83-.67 1.5-1.5 1.5H9l-4 3.5v-3.5H5.5C4.67 15 4 14.33 4 13.5v-8Z"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        strokeLinejoin="round"
-      />
-      <rect x="10.4" y="8.1" width="5.2" height="4.2" rx="1" stroke="currentColor" strokeWidth="1.3" />
-      <path d="M11.6 8.1V6.9a1.3 1.3 0 1 1 2.6 0v1.2" stroke="currentColor" strokeWidth="1.3" />
-    </svg>
-  );
-}
 
 function LogoCube() {
   const faces = [
@@ -76,127 +64,167 @@ function LogoCube() {
   );
 }
 
-function PhoneMock({
-  w = 140,
-  style,
-  className = "",
-  screenSrc,
-}: {
-  w?: number;
-  style?: React.CSSProperties;
-  className?: string;
-  screenSrc?: string;
-}) {
-  const h = Math.round(w * 2.05);
-  return (
-    <div
-      className={`rounded-[26px] border ${className}`}
-      style={{
-        width: w,
-        height: h,
-        background: "linear-gradient(180deg,#171b1f,#0d1013)",
-        borderColor: "rgba(255,255,255,0.08)",
-        boxShadow: "0 20px 45px -15px rgba(0,0,0,0.65)",
-        ...style,
-      }}
-    >
-      <div className="relative h-full w-full p-[7px]">
-        <div className="absolute left-1/2 top-[7px] h-[5px] w-9 -translate-x-1/2 rounded-full bg-black/50" />
-        <div className="flex h-full w-full flex-col overflow-hidden rounded-[20px] bg-[#0a0c0e]">
-          {screenSrc ? (
-            <div className="relative h-full w-full">
-              <Image src={screenSrc} alt="SpeakEZ encrypted call screen" fill sizes={`${w}px`} className="object-cover" />
-            </div>
-          ) : (
-            <>
-              <div className="flex items-center gap-1.5 px-3 pt-4 pb-2">
-                <Logo size={13} className="text-[#4FD1C5]" />
-                <span
-                  style={{ fontFamily: "var(--font-display)" }}
-                  className="text-[9px] tracking-wide text-zinc-200"
-                >
-                  SpeakEZ
-                </span>
-              </div>
-              <div className="flex-1 space-y-1.5 px-3 pt-1">
-                <div className="h-1.5 w-3/5 rounded-full bg-white/10" />
-                <div className="ml-auto h-1.5 w-2/5 rounded-full bg-[#4FD1C5]/30" />
-                <div className="h-1.5 w-4/5 rounded-full bg-white/10" />
-                <div className="ml-auto h-1.5 w-1/2 rounded-full bg-[#4FD1C5]/30" />
-              </div>
-            </>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-}
+type HeroPreview = {
+  title: string;
+  description: string;
+  href: string;
+  imageSrc: string;
+  imageAlt: string;
+};
 
-function LaptopMock({
-  w = 260,
-  style,
-  screenSrc,
-}: {
-  w?: number;
-  style?: React.CSSProperties;
-  screenSrc?: string;
-}) {
-  const screenH = Math.round(w * 0.6);
-  return (
-    <div style={{ width: w, ...style }} className="select-none">
-      <div
-        className="rounded-t-[10px] border border-white/10 bg-[#12161a] p-[6px]"
-        style={{ height: screenH, boxShadow: "0 20px 45px -15px rgba(0,0,0,0.65)" }}
-      >
-        <div className="relative flex h-full w-full flex-col overflow-hidden rounded-[6px] bg-[#0a0c0e] p-3">
-          {screenSrc ? (
-            <Image src={screenSrc} alt="SpeakEZ desktop chat screen" fill sizes={`${w}px`} className="object-cover" />
-          ) : (
-            <>
-              <div className="mb-2 flex items-center gap-1.5">
-                <Logo size={11} className="text-[#4FD1C5]" />
-                <span
-                  style={{ fontFamily: "var(--font-display)" }}
-                  className="text-[8px] tracking-wide text-zinc-300"
-                >
-                  SpeakEZ
-                </span>
-              </div>
-              <div className="grid flex-1 grid-cols-3 gap-1.5">
-                <div className="rounded bg-white/5" />
-                <div className="col-span-2 flex flex-col justify-end gap-1 rounded bg-white/5 p-1.5">
-                  <div className="h-1 w-3/4 rounded-full bg-white/10" />
-                  <div className="ml-auto h-1 w-1/2 rounded-full bg-[#4FD1C5]/30" />
-                </div>
-              </div>
-            </>
-          )}
-        </div>
-      </div>
-      <div className="h-[10px] rounded-b-[8px] border-x border-b border-white/10 bg-[#1a1e22]" />
-      <div className="mx-auto h-[3px] w-16 rounded-b-md bg-[#232830]" />
-    </div>
-  );
-}
+const heroPreviews = {
+  box: {
+    title: "The SpeakEZ server",
+    description: "Open the hardware details",
+    href: "#hardware",
+    imageSrc: "/intel-nuc-transparent.png",
+    imageAlt: "SpeakEZ server mini PC",
+  },
+  phone: {
+    title: "SpeakEZ on your phone",
+    description: "Open the messaging workflow",
+    href: "#how-it-works",
+    imageSrc: "/calling-screen.png",
+    imageAlt: "SpeakEZ mobile screen",
+  },
+} satisfies Record<string, HeroPreview>;
+
+const salesHeadlines = [
+  "Your messages. Your server. Your rules.",
+  "Private messaging without surrendering your data.",
+  "Own the conversation. Keep it encrypted.",
+  "Self-hosted security that stays with you.",
+  "Speak freely. Keep it local.",
+];
 
 export default function Home() {
+  const [introPlaying, setIntroPlaying] = useState(true);
+  const [salesHeadlineIndex, setSalesHeadlineIndex] = useState(0);
+  const [activePreview, setActivePreview] = useState<HeroPreview | null>(null);
+  const [showHowItWorks, setShowHowItWorks] = useState(false);
+  const [showHardware, setShowHardware] = useState(false);
+  const [showBenefits, setShowBenefits] = useState(false);
+  const [showAboutApp, setShowAboutApp] = useState(false);
+  const [showWhyApp, setShowWhyApp] = useState(false);
+  const [showGetApp, setShowGetApp] = useState(false);
+  const [openMenu, setOpenMenu] = useState<"self-host" | "app" | null>(null);
+  const introVideoRef = useRef<HTMLVideoElement>(null);
+  const previewTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const clearPreviewTimer = () => {
+    if (previewTimerRef.current) {
+      clearTimeout(previewTimerRef.current);
+      previewTimerRef.current = null;
+    }
+  };
+
+  const showPreviewAfterDelay = (preview: HeroPreview) => {
+    clearPreviewTimer();
+    previewTimerRef.current = setTimeout(() => setActivePreview(preview), 350);
+  };
+
+  const finishIntro = () => {
+    setIntroPlaying(false);
+  };
+
+  const closeAllModals = () => {
+    setShowHowItWorks(false);
+    setShowHardware(false);
+    setShowBenefits(false);
+    setShowAboutApp(false);
+    setShowWhyApp(false);
+    setShowGetApp(false);
+  };
+
+  const anyModalOpen = showHowItWorks || showHardware || showBenefits || showAboutApp || showWhyApp;
+
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      setSalesHeadlineIndex((index) => (index + 1) % salesHeadlines.length);
+    }, 5200);
+
+    return () => clearInterval(intervalId);
+  }, []);
+
   return (
     <div
-      className={`${display.variable} ${body.variable} ${mono.variable} min-h-screen bg-[#646a70] text-[#E7ECEF]`}
+      className={`${display.variable} ${body.variable} ${mono.variable} relative min-h-screen overflow-x-hidden bg-[#101518] text-[#E7ECEF]`}
       style={{
         fontFamily: "var(--font-body)",
-        backgroundImage:
-          "repeating-linear-gradient(105deg, rgba(255,255,255,0.055) 0, rgba(255,255,255,0.055) 1px, transparent 1px, transparent 5px), linear-gradient(135deg, #737980 0%, #51575e 48%, #6b7178 100%)",
       }}
     >
+      <video
+        ref={introVideoRef}
+        autoPlay
+        muted
+        playsInline
+        controls={false}
+        preload="auto"
+        aria-hidden="true"
+        className={`fixed inset-0 z-0 h-screen w-screen object-cover ${introPlaying ? "visible" : "invisible"}`}
+        onEnded={finishIntro}
+        onError={() => setIntroPlaying(false)}
+      >
+        <source src="/speakez-intro.mp4" type="video/mp4" />
+      </video>
+      <div
+        aria-hidden="true"
+        className={`fixed inset-0 z-0 bg-cover bg-center ${introPlaying ? "invisible" : "visible"}`}
+        style={{ backgroundImage: "url('/speakez-intro-final-frame.png')" }}
+      />
+      <div className="fixed inset-0 z-[1] bg-black/45" aria-hidden="true" />
+      <div className="storm-glow fixed inset-0 z-[3] pointer-events-none" aria-hidden="true" />
+
+      <div
+        className={`relative z-10 ${introPlaying ? "pointer-events-none invisible" : "visible"}`}
+        aria-hidden={introPlaying}
+      >
       <style>{`
         @keyframes dashflow { to { stroke-dashoffset: -60; } }
         @keyframes floaty { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-7px); } }
         @keyframes hv-cube-rotate { from { transform: rotateX(-18deg) rotateY(0deg); } to { transform: rotateX(-18deg) rotateY(360deg); } }
+        @keyframes storm-glow {
+          0%, 12%, 100% { opacity: 0; }
+          15% { opacity: 0.2; }
+          18% { opacity: 0.04; }
+          20% { opacity: 0.38; }
+          23% { opacity: 0.06; }
+          43% { opacity: 0; }
+          47% { opacity: 0.16; }
+          50% { opacity: 0.03; }
+          54% { opacity: 0.32; }
+          57% { opacity: 0.05; }
+          77% { opacity: 0; }
+          81% { opacity: 0.24; }
+          84% { opacity: 0; }
+        }
         .flow-line { stroke-dasharray: 3 6; animation: dashflow 3.2s linear infinite; }
         .float { animation: floaty 5s ease-in-out infinite; }
+        .nav-neon { text-shadow: 0 0 5px rgba(139, 92, 246, 0.85), 0 0 14px rgba(139, 92, 246, 0.65), 0 0 24px rgba(139, 92, 246, 0.4); }
+        .heading-neon { text-shadow: 0 0 5px rgba(139, 92, 246, 0.85), 0 0 14px rgba(139, 92, 246, 0.65), 0 0 24px rgba(139, 92, 246, 0.4); }
+        .subheading-neon { text-shadow: 0 0 3px rgba(139, 92, 246, 0.65), 0 0 9px rgba(139, 92, 246, 0.35); }
+        @keyframes sales-headline-in {
+          from { opacity: 0; transform: translateY(12px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        .sales-headline { animation: sales-headline-in 650ms ease-out both; }
+        .dropdown-page {
+          background-color: #080d12;
+          background-image: linear-gradient(rgba(8, 13, 18, 0.88), rgba(8, 13, 18, 0.93)), url("https://images.unsplash.com/photo-1534088568595-a066f410bcda?auto=format&fit=crop&w=2400&q=85");
+          background-position: center;
+          background-size: cover;
+          background-attachment: fixed;
+        }
+        .storm-glow {
+          background:
+            radial-gradient(ellipse 55% 78% at 4% 52%, rgba(207, 244, 255, 1), transparent 74%),
+            radial-gradient(ellipse 48% 70% at 97% 40%, rgba(185, 237, 255, 1), transparent 76%),
+            linear-gradient(110deg, rgba(192, 242, 255, 0.2), transparent 42%, rgba(180, 235, 255, 0.14));
+          mix-blend-mode: screen;
+          animation: storm-glow 10s ease-in-out infinite;
+        }
         @media (prefers-reduced-motion: reduce) {
-          .flow-line, .float, [style*="hv-cube-rotate"] { animation: none !important; }
+          .flow-line, .float, .storm-glow, .sales-headline, [style*="hv-cube-rotate"] { animation: none !important; }
         }
       `}</style>
 
@@ -208,121 +236,254 @@ export default function Home() {
             SpeakEZ
           </span>
         </div>
-        <nav className="hidden items-center gap-8 text-sm text-zinc-400 sm:flex">
-          <a href="#how-it-works" className="rounded-sm hover:text-zinc-100 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#4FD1C5]">How it works</a>
-          <a href="#hardware" className="rounded-sm hover:text-zinc-100 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#4FD1C5]">Hardware</a>
-          <a href="#benefits" className="rounded-sm hover:text-zinc-100 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#4FD1C5]">Why self-host</a>
+        <nav className="hidden items-center gap-8 text-sm font-bold text-white sm:flex">
+          <a
+            href="#top"
+            onClick={(event) => { event.preventDefault(); closeAllModals(); setOpenMenu(null); }}
+            className="nav-neon rounded-sm hover:text-violet-200 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-violet-500"
+          >
+            Home
+          </a>
+
+          <div
+            className="relative"
+            onMouseEnter={() => setOpenMenu("self-host")}
+            onMouseLeave={() => setOpenMenu((menu) => (menu === "self-host" ? null : menu))}
+          >
+            <button
+              type="button"
+              aria-haspopup="true"
+              aria-expanded={openMenu === "self-host"}
+              onClick={() => setOpenMenu((menu) => (menu === "self-host" ? null : "self-host"))}
+              className="nav-neon flex items-center gap-1 rounded-sm hover:text-violet-200 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-violet-500"
+            >
+              Self-host
+              <span aria-hidden="true" className="text-[0.6rem]">&#9662;</span>
+            </button>
+            {openMenu === "self-host" && (
+              <div className="absolute left-2 top-full z-30 w-56 pt-3">
+                <ol className="list-none overflow-hidden rounded-lg border border-violet-500/40 bg-[#0b0f18]/75 py-1 shadow-2xl shadow-black/60 backdrop-blur-md">
+                  <li>
+                    <button type="button" onClick={() => { setOpenMenu(null); closeAllModals(); setShowHowItWorks(true); }} className="block w-full px-4 py-2.5 text-left text-white transition-colors hover:bg-violet-500/15 hover:text-violet-200">How it works</button>
+                  </li>
+                  <li>
+                    <button type="button" onClick={() => { setOpenMenu(null); closeAllModals(); setShowHardware(true); }} className="block w-full px-4 py-2.5 text-left text-white transition-colors hover:bg-violet-500/15 hover:text-violet-200">Hardware</button>
+                  </li>
+                  <li>
+                    <button type="button" onClick={() => { setOpenMenu(null); closeAllModals(); setShowBenefits(true); }} className="block w-full px-4 py-2.5 text-left text-white transition-colors hover:bg-violet-500/15 hover:text-violet-200">Why self-host</button>
+                  </li>
+                </ol>
+              </div>
+            )}
+          </div>
+
+          <div
+            className="relative"
+            onMouseEnter={() => setOpenMenu("app")}
+            onMouseLeave={() => setOpenMenu((menu) => (menu === "app" ? null : menu))}
+          >
+            <button
+              type="button"
+              aria-haspopup="true"
+              aria-expanded={openMenu === "app"}
+              onClick={() => setOpenMenu((menu) => (menu === "app" ? null : "app"))}
+              className="nav-neon flex items-center gap-1 rounded-sm hover:text-violet-200 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-violet-500"
+            >
+              App
+              <span aria-hidden="true" className="text-[0.6rem]">&#9662;</span>
+            </button>
+            {openMenu === "app" && (
+              <div className="absolute left-2 top-full z-30 w-60 pt-3">
+                <ol className="list-none overflow-hidden rounded-lg border border-violet-500/40 bg-[#0b0f18]/75 py-1 shadow-2xl shadow-black/60 backdrop-blur-md">
+                  <li>
+                    <button type="button" onClick={() => { setOpenMenu(null); closeAllModals(); setShowAboutApp(true); }} className="block w-full px-4 py-2.5 text-left text-white transition-colors hover:bg-violet-500/15 hover:text-violet-200">About the app</button>
+                  </li>
+                  <li>
+                    <button type="button" onClick={() => { setOpenMenu(null); closeAllModals(); setShowWhyApp(true); }} className="block w-full px-4 py-2.5 text-left text-white transition-colors hover:bg-violet-500/15 hover:text-violet-200">Why this messaging app</button>
+                  </li>
+                  <li>
+                    <button type="button" onClick={() => { setOpenMenu(null); setShowGetApp(true); }} className="block w-full px-4 py-2.5 text-left text-white transition-colors hover:bg-violet-500/15 hover:text-violet-200">Get the app</button>
+                  </li>
+                </ol>
+              </div>
+            )}
+          </div>
         </nav>
-        <a
-          href="#get-started"
-          className="rounded-full bg-[#4FD1C5] px-4 py-2 text-sm font-medium text-[#0a0c0e] transition-colors hover:bg-[#6adfd4] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#4FD1C5]"
-        >
-          Get started
-        </a>
       </header>
 
-      {/* Hero */}
-      <section className="mx-auto max-w-6xl px-6 pt-10 sm:px-10 sm:pt-16">
-        <div className=" lg:items-center">
-          
+      <section className="pointer-events-none fixed left-1/2 top-[56%] z-10 w-[min(78vw,460px)] -translate-x-1/2 -translate-y-1/2 text-center sm:w-[min(32vw,460px)]" aria-live="polite">
+        <p style={{ fontFamily: "var(--font-mono)" }} className="mb-3 text-xs font-medium uppercase tracking-wider text-violet-200">
+          Private communication, on your terms
+        </p>
+        <h1
+          key={salesHeadlineIndex}
+          style={{ fontFamily: "var(--font-display)" }}
+          className="sales-headline heading-neon text-2xl font-bold leading-tight text-white sm:text-4xl"
+        >
+          {salesHeadlines[salesHeadlineIndex]}
+        </h1>
+      </section>
 
-          {/* Diagram: box connecting to laptop + phones */}
-          <div className="relative mx-auto aspect-[16/12] w-full max-w-2xl">
-            <svg
-              viewBox="0 0 100 100"
-              preserveAspectRatio="none"
-              className="pointer-events-none absolute inset-0 h-full w-full text-[#4FD1C5]/50"
-            >
-              <path d="M52,42 Q63,22 79,14" fill="none" stroke="currentColor" strokeWidth="0.5" className="flow-line" />
-              <path d="M38,50 Q26,43 14,45" fill="none" stroke="currentColor" strokeWidth="0.5" className="flow-line" />
-              <path d="M58,60 Q70,70 83,73" fill="none" stroke="currentColor" strokeWidth="0.5" className="flow-line" />
-            </svg>
+      <div
+        className={`pointer-events-none fixed inset-0 z-20 ${anyModalOpen ? "invisible" : "visible"}`}
+        onMouseLeave={() => { clearPreviewTimer(); setActivePreview(null); }}
+      >
+        <button
+          type="button"
+          aria-label="Preview the upper-left phone in the background"
+          aria-expanded={activePreview === heroPreviews.phone}
+          className="pointer-events-auto absolute left-[25%] top-[12%] h-[31%] w-[14%] rounded-xl focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#4FD1C5]"
+          onMouseEnter={() => showPreviewAfterDelay(heroPreviews.phone)}
+          onFocus={() => setActivePreview(heroPreviews.phone)}
+          onClick={() => { clearPreviewTimer(); setActivePreview(heroPreviews.phone); }}
+        />
+        <button
+          type="button"
+          aria-label="Preview the upper-right phone in the background"
+          aria-expanded={activePreview === heroPreviews.phone}
+          className="pointer-events-auto absolute left-[62%] top-[12%] h-[31%] w-[14%] rounded-xl focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#4FD1C5]"
+          onMouseEnter={() => showPreviewAfterDelay(heroPreviews.phone)}
+          onFocus={() => setActivePreview(heroPreviews.phone)}
+          onClick={() => { clearPreviewTimer(); setActivePreview(heroPreviews.phone); }}
+        />
+        <button
+          type="button"
+          aria-label="Preview the lower-left phone in the background"
+          aria-expanded={activePreview === heroPreviews.phone}
+          className="pointer-events-auto absolute left-[25%] top-[56%] h-[32%] w-[14%] rounded-xl focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#4FD1C5]"
+          onMouseEnter={() => showPreviewAfterDelay(heroPreviews.phone)}
+          onFocus={() => setActivePreview(heroPreviews.phone)}
+          onClick={() => { clearPreviewTimer(); setActivePreview(heroPreviews.phone); }}
+        />
+        <button
+          type="button"
+          aria-label="Preview the lower-right phone in the background"
+          aria-expanded={activePreview === heroPreviews.phone}
+          className="pointer-events-auto absolute left-[62%] top-[56%] h-[32%] w-[14%] rounded-xl focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#4FD1C5]"
+          onMouseEnter={() => showPreviewAfterDelay(heroPreviews.phone)}
+          onFocus={() => setActivePreview(heroPreviews.phone)}
+          onClick={() => { clearPreviewTimer(); setActivePreview(heroPreviews.phone); }}
+        />
+        <button
+          type="button"
+          aria-label="Preview the SpeakEZ server box in the background"
+          aria-expanded={activePreview === heroPreviews.box}
+          className="pointer-events-auto absolute left-[44%] top-[46%] h-[9%] w-[12%] rounded-xl focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#4FD1C5]"
+          onMouseEnter={() => showPreviewAfterDelay(heroPreviews.box)}
+          onFocus={() => setActivePreview(heroPreviews.box)}
+          onClick={() => { clearPreviewTimer(); setActivePreview(heroPreviews.box); }}
+        />
 
-            {/* the box */}
-            <div
-              className="float absolute left-1/2 top-1/2 w-[30%] -translate-x-1/2 -translate-y-1/2 rounded-2xl border border-white/10 bg-white/[0.03] p-3 backdrop-blur-sm"
-              style={{ boxShadow: "0 25px 60px -20px rgba(79,209,197,0.15)" }}
-            >
-              <Image
-                src="/intel-nuc-transparent.png"
-                alt="Small form-factor PC running the SpeakEZ server"
-                width={435}
-                height={495}
-                className="w-full rounded-lg"
-              />
-              <p style={{ fontFamily: "var(--font-mono)" }} className="mt-2 text-center text-[10px] text-zinc-400">
-                the box
-              </p>
+        {activePreview && (
+          <a
+            href={activePreview.href}
+            className="pointer-events-auto absolute left-1/2 top-1/2 z-30 w-[min(82vw,420px)] -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-lg border border-[#4FD1C5]/60 bg-[#081015]/95 shadow-2xl shadow-black/60 backdrop-blur-md focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#4FD1C5]"
+            onClick={(event) => {
+              if (activePreview.href === "#how-it-works") {
+                event.preventDefault();
+                setActivePreview(null);
+                setShowHowItWorks(true);
+              }
+              if (activePreview.href === "#hardware") {
+                event.preventDefault();
+                setActivePreview(null);
+                setShowHardware(true);
+              }
+            }}
+          >
+            <div className="relative aspect-[4/3] w-full bg-black/30">
+              <Image src={activePreview.imageSrc} alt={activePreview.imageAlt} fill sizes="420px" className="object-contain" />
             </div>
-
-            {/* laptop, upper right */}
-            <div className="float absolute right-[2%] top-[2%] w-[35%]" style={{ animationDelay: "0.4s" }}>
-              <LaptopMock w={200} screenSrc="/laptop-chat-screen.png" style={{ width: "100%" }} />
+            <div className="flex items-center justify-between gap-4 px-4 py-3">
+              <div>
+                <p style={{ fontFamily: "var(--font-display)" }} className="text-base font-medium text-zinc-50">
+                  {activePreview.title}
+                </p>
+                <p className="mt-1 text-sm text-zinc-300">{activePreview.description}</p>
+              </div>
+              <span aria-hidden="true" className="text-xl text-[#4FD1C5]">&rarr;</span>
             </div>
+          </a>
+        )}
+      </div>
 
-            {/* secondary phone, mid right */}
-            <div
-              className="float absolute left-[4%] top-[30%] hidden w-[18%] sm:block"
-              style={{ animationDelay: "0.8s" }}
-            >
-              <PhoneMock w={100} style={{ width: "100%", height: "auto", aspectRatio: "1 / 2.05" }} />
+      {showHowItWorks && (
+        <section
+          id="how-it-works"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="how-it-works-title"
+          className="dropdown-page fixed inset-0 z-40 overflow-y-auto px-6 py-16 text-[#E7ECEF] sm:px-10"
+        >
+          <div className="mx-auto max-w-5xl">
+            <div className="flex items-start justify-between gap-6">
+              <div>
+                <p style={{ fontFamily: "var(--font-mono)" }} className="text-xs uppercase tracking-wider text-violet-300">Messaging workflow</p>
+                <h2 id="how-it-works-title" style={{ fontFamily: "var(--font-display)" }} className="heading-neon mt-3 text-2xl font-medium tracking-tight text-zinc-50 sm:text-3xl">
+                  Getting started with SpeakEZ
+                </h2>
+              </div>
+              <button
+                type="button"
+                aria-label="Close messaging workflow"
+                className="grid h-10 w-10 shrink-0 place-items-center rounded-full border border-white/15 text-xl text-zinc-100 transition-colors hover:border-violet-400 hover:text-violet-300 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-violet-500"
+                onClick={() => setShowHowItWorks(false)}
+              >
+                &times;
+              </button>
             </div>
-
-            {/* foreground phone */}
-            <div className="float absolute bottom-0 right-[3%] z-10 w-[28%]" style={{ animationDelay: "1.2s" }}>
-              <PhoneMock
-                w={170}
-                screenSrc="/calling-screen.png"
-                style={{ width: "100%", height: "auto", aspectRatio: "1 / 2.05" }}
-              />
+            <p className="mt-4 max-w-2xl text-zinc-300">
+              Once you have downloaded SpeakEZ from the App Store or Google Play,
+              follow these steps to set up your private messaging space.
+            </p>
+            <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+              {[
+                {
+                  n: "01",
+                  title: "Set up your lock",
+                  body: "Open SpeakEZ and choose a personal unlock code. The app asks for this whenever you reopen it, keeping your chats protected on your device.",
+                },
+                {
+                  n: "02",
+                  title: "Choose a pseudo name",
+                  body: "Create the name people will see in your chats. There is no phone number or public profile required to get started.",
+                },
+                {
+                  n: "03",
+                  title: "Create or accept an invite",
+                  body: "Tap the + button to create a secure invite image for someone else, or scan an invite image or link that they have shared with you.",
+                },
+                {
+                  n: "04",
+                  title: "Start a private chat",
+                  body: "Once connected, send encrypted messages, voice notes, photos, and files. The in-app guide will introduce your chats, groups, and settings.",
+                },
+              ].map((step) => (
+                <div key={step.n} className="rounded-lg border border-white/10 bg-white/[0.03] p-6">
+                  <span style={{ fontFamily: "var(--font-mono)" }} className="text-sm text-violet-300">{step.n}</span>
+                  <h3 style={{ fontFamily: "var(--font-display)" }} className="subheading-neon mt-3 text-lg font-medium text-zinc-50">{step.title}</h3>
+                  <p className="mt-2 text-sm leading-6 text-zinc-400">{step.body}</p>
+                </div>
+              ))}
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
-      {/* How it works */}
-      <section id="how-it-works" className="mx-auto max-w-6xl px-6 py-24 sm:px-10">
-        <h2 style={{ fontFamily: "var(--font-display)" }} className="text-2xl font-medium tracking-tight text-zinc-50 sm:text-3xl">
-          Three steps, one box
+      {showHardware && (
+      <section id="hardware" role="dialog" aria-modal="true" aria-labelledby="hardware-title" className="dropdown-page fixed inset-0 z-40 overflow-y-auto px-6 py-16 text-[#E7ECEF] sm:px-10">
+        <div className="mx-auto max-w-5xl">
+        <div className="flex items-start justify-between gap-6">
+          <div>
+            <p style={{ fontFamily: "var(--font-mono)" }} className="text-xs uppercase tracking-wider text-violet-300">Hardware</p>
+        <h2 style={{ fontFamily: "var(--font-display)" }} className="heading-neon text-2xl font-medium tracking-tight text-zinc-50 sm:text-3xl">
+          It doesn&apos;t take much hardware
         </h2>
-        <div className="mt-10 grid gap-8 sm:grid-cols-3">
-          {[
-            {
-              n: "01",
-              title: "Install",
-              body: "Deploy the SpeakEZ server package on a mini PC, appliance, or spare machine already sitting in your office or server closet.",
-            },
-            {
-              n: "02",
-              title: "Connect",
-              body: "Phones, laptops, and tablets on the same network find the box and pair with it — no separate account system to stand up.",
-            },
-            {
-              n: "03",
-              title: "Message",
-              body: "Everyone chats, calls, and shares files end-to-end encrypted, entirely within your network, start to finish.",
-            },
-          ].map((step) => (
-            <div key={step.n} className="rounded-2xl border border-white/10 bg-white/[0.02] p-6">
-              <span style={{ fontFamily: "var(--font-mono)" }} className="text-sm text-[#4FD1C5]">
-                {step.n}
-              </span>
-              <h3 style={{ fontFamily: "var(--font-display)" }} className="mt-3 text-lg font-medium text-zinc-50">
-                {step.title}
-              </h3>
-              <p className="mt-2 text-sm leading-6 text-zinc-400">{step.body}</p>
-            </div>
-          ))}
+          </div>
+          <button type="button" aria-label="Close hardware" className="grid h-10 w-10 shrink-0 place-items-center rounded-full border border-white/15 text-xl text-zinc-100 transition-colors hover:border-violet-400 hover:text-violet-300 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-violet-500" onClick={() => setShowHardware(false)}>&times;</button>
         </div>
-      </section>
-
-      {/* Hardware */}
-      <section id="hardware" className="mx-auto max-w-6xl px-6 py-24 sm:px-10">
-        <h2 style={{ fontFamily: "var(--font-display)" }} className="text-2xl font-medium tracking-tight text-zinc-50 sm:text-3xl">
-          It doesn't take much hardware
-        </h2>
         <p className="mt-4 max-w-2xl text-zinc-400">
-          SpeakEZ's server is light enough to run on a small mini PC tucked into
+          SpeakEZ&apos;s server is light enough to run on a small mini PC tucked into
           a cupboard — no rack, no dedicated IT room required.
         </p>
         <div className="mt-10 grid gap-6 sm:grid-cols-2">
@@ -334,7 +495,7 @@ export default function Home() {
               height={495}
               className="mx-auto h-48 w-auto rounded-lg object-contain"
             />
-            <p style={{ fontFamily: "var(--font-mono)" }} className="mt-4 text-xs uppercase tracking-wider text-[#4FD1C5]">
+            <p style={{ fontFamily: "var(--font-mono)" }} className="mt-4 text-xs uppercase tracking-wider text-violet-300">
               Compact form factor
             </p>
             <p className="mt-1 text-sm text-zinc-400">
@@ -350,7 +511,7 @@ export default function Home() {
               height={300}
               className="mx-auto h-48 w-auto rounded-lg object-contain"
             />
-            <p style={{ fontFamily: "var(--font-mono)" }} className="mt-4 text-xs uppercase tracking-wider text-[#4FD1C5]">
+            <p style={{ fontFamily: "var(--font-mono)" }} className="mt-4 text-xs uppercase tracking-wider text-violet-300">
               Room to grow
             </p>
             <p className="mt-1 text-sm text-zinc-400">
@@ -359,13 +520,22 @@ export default function Home() {
             </p>
           </div>
         </div>
+        </div>
       </section>
+      )}
 
-      {/* Benefits */}
-      <section id="benefits" className="mx-auto max-w-6xl px-6 py-24 sm:px-10">
-        <h2 style={{ fontFamily: "var(--font-display)" }} className="text-2xl font-medium tracking-tight text-zinc-50 sm:text-3xl">
+      {showBenefits && (
+      <section id="benefits" role="dialog" aria-modal="true" aria-labelledby="benefits-title" className="dropdown-page fixed inset-0 z-40 overflow-y-auto px-6 py-16 text-[#E7ECEF] sm:px-10">
+        <div className="mx-auto max-w-5xl">
+        <div className="flex items-start justify-between gap-6">
+          <div>
+            <p style={{ fontFamily: "var(--font-mono)" }} className="text-xs uppercase tracking-wider text-violet-300">Self-hosting</p>
+        <h2 style={{ fontFamily: "var(--font-display)" }} className="heading-neon text-2xl font-medium tracking-tight text-zinc-50 sm:text-3xl">
           Why organizations run it themselves
         </h2>
+          </div>
+          <button type="button" aria-label="Close self-hosting details" className="grid h-10 w-10 shrink-0 place-items-center rounded-full border border-white/15 text-xl text-zinc-100 transition-colors hover:border-violet-400 hover:text-violet-300 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-violet-500" onClick={() => setShowBenefits(false)}>&times;</button>
+        </div>
         <div className="mt-10 grid gap-8 sm:grid-cols-2">
           {[
             {
@@ -386,33 +556,157 @@ export default function Home() {
             },
           ].map((b) => (
             <div key={b.title} className="border-t border-white/10 pt-6">
-              <h3 style={{ fontFamily: "var(--font-display)" }} className="text-lg font-medium text-zinc-50">
+              <h3 style={{ fontFamily: "var(--font-display)" }} className="subheading-neon text-lg font-medium text-zinc-50">
                 {b.title}
               </h3>
               <p className="mt-2 text-sm leading-6 text-zinc-400">{b.body}</p>
             </div>
           ))}
         </div>
-      </section>
-
-      {/* Footer CTA */}
-      <section className="mx-auto max-w-6xl px-6 pb-28 sm:px-10">
-        <div className="rounded-3xl border border-white/10 bg-white/[0.02] px-8 py-14 text-center sm:px-16">
-          <h2 style={{ fontFamily: "var(--font-display)" }} className="text-2xl font-medium tracking-tight text-zinc-50 sm:text-3xl">
-            Bring messaging in-house
-          </h2>
-          <p className="mx-auto mt-4 max-w-md text-zinc-400">
-            Set up SpeakEZ on a machine you control, and connect every device in
-            your organization to it.
-          </p>
-          <a
-            href="#"
-            className="mt-8 inline-flex h-12 items-center justify-center rounded-full bg-[#4FD1C5] px-7 text-sm font-medium text-[#0a0c0e] transition-colors hover:bg-[#6adfd4] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#4FD1C5]"
-          >
-            Get the self-hosting guide
-          </a>
         </div>
       </section>
+      )}
+
+      {showAboutApp && (
+      <section id="about-app" role="dialog" aria-modal="true" aria-labelledby="about-app-title" className="dropdown-page fixed inset-0 z-40 overflow-y-auto px-6 py-16 text-[#E7ECEF] sm:px-10">
+        <div className="mx-auto max-w-5xl">
+          <div className="flex items-start justify-between gap-6">
+            <div>
+              <p style={{ fontFamily: "var(--font-mono)" }} className="text-xs uppercase tracking-wider text-violet-300">The app</p>
+              <h2 id="about-app-title" style={{ fontFamily: "var(--font-display)" }} className="heading-neon mt-3 text-2xl font-medium tracking-tight text-zinc-50 sm:text-3xl">
+                About the SpeakEZ app
+              </h2>
+            </div>
+            <button type="button" aria-label="Close about the app" className="grid h-10 w-10 shrink-0 place-items-center rounded-full border border-white/15 text-xl text-zinc-100 transition-colors hover:border-violet-400 hover:text-violet-300 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-violet-500" onClick={() => setShowAboutApp(false)}>&times;</button>
+          </div>
+          <p className="mt-4 max-w-2xl text-zinc-400">
+            The SpeakEZ app puts encrypted messaging, voice, and file sharing in your
+            pocket — pairing with your self-hosted server or the public SpeakEZ service
+            without any complicated onboarding.
+          </p>
+          <div className="mt-10 grid gap-8 sm:grid-cols-3">
+            {[
+              {
+                title: "Messaging, voice & media",
+                body: "Instant text, voice messages, photos, and file transfers in one encrypted space across every device.",
+              },
+              {
+                title: "Private by default",
+                body: "End-to-end encrypted on-device. Your conversations and files stay yours — not another platform's raw material.",
+              },
+              {
+                title: "Every platform",
+                body: "Native Android and iOS apps that connect straight to your box, ready to use from the first minute.",
+              },
+            ].map((item) => (
+              <div key={item.title} className="rounded-lg border border-white/10 bg-white/[0.03] p-6">
+                <h3 style={{ fontFamily: "var(--font-display)" }} className="subheading-neon text-lg font-medium text-zinc-50">{item.title}</h3>
+                <p className="mt-2 text-sm leading-6 text-zinc-400">{item.body}</p>
+              </div>
+            ))}
+          </div>
+          <div className="mt-10 flex flex-col gap-3 sm:flex-row">
+            <a href="https://play.google.com/store/apps/details?id=com.spkezz.app&pli=1" target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center gap-2 rounded-full bg-violet-500 px-6 py-3.5 text-sm font-semibold text-white transition-colors hover:bg-violet-400 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-violet-500">
+              <span aria-hidden="true" className="h-5 w-5 bg-contain bg-center bg-no-repeat" style={{ backgroundImage: "url('https://cdn.simpleicons.org/googleplay/ffffff')" }} />
+              Get it on Google Play
+            </a>
+            <a href="https://apps.apple.com/gb/app/spkez/id6763252365" target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center gap-2 rounded-full border border-violet-500/50 px-6 py-3.5 text-sm font-semibold text-violet-200 transition-colors hover:border-violet-400 hover:text-white focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-violet-500">
+              <span aria-hidden="true" className="h-5 w-5 bg-contain bg-center bg-no-repeat" style={{ backgroundImage: "url('https://cdn.simpleicons.org/appstore/ffffff')" }} />
+              Download on the App Store
+            </a>
+          </div>
+        </div>
+      </section>
+      )}
+
+      {showWhyApp && (
+      <section id="why-app" role="dialog" aria-modal="true" aria-labelledby="why-app-title" className="dropdown-page fixed inset-0 z-40 overflow-y-auto px-6 py-16 text-[#E7ECEF] sm:px-10">
+        <div className="mx-auto max-w-5xl">
+          <div className="flex items-start justify-between gap-6">
+            <div>
+              <p style={{ fontFamily: "var(--font-mono)" }} className="text-xs uppercase tracking-wider text-violet-300">Why this messaging app</p>
+              <h2 id="why-app-title" style={{ fontFamily: "var(--font-display)" }} className="heading-neon mt-3 text-2xl font-medium tracking-tight text-zinc-50 sm:text-3xl">
+                Why a dedicated messaging app
+              </h2>
+            </div>
+            <button type="button" aria-label="Close why this messaging app" className="grid h-10 w-10 shrink-0 place-items-center rounded-full border border-white/15 text-xl text-zinc-100 transition-colors hover:border-violet-400 hover:text-violet-300 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-violet-500" onClick={() => setShowWhyApp(false)}>&times;</button>
+          </div>
+          <div className="mt-10 grid gap-8 sm:grid-cols-2">
+            {[
+              {
+                title: "You are the customer, not the product",
+                body: "Mainstream apps monetise your data. SpeakEZ doesn't — no ad targeting, no behavioural inventory, no selling of your conversations.",
+              },
+              {
+                title: "Talks to your own server",
+                body: "The app pairs directly with your self-hosted box, so messages, calls, and files stay inside your network end to end.",
+              },
+              {
+                title: "Encrypted everywhere",
+                body: "Every message is encrypted on the device before it leaves, the same standard whether you self-host or use the public service.",
+              },
+              {
+                title: "Simple enough for anyone",
+                body: "No technical setup, no consultancy phase. Install it, pair it, and start communicating securely straight away.",
+              },
+            ].map((item) => (
+              <div key={item.title} className="border-t border-white/10 pt-6">
+                <h3 style={{ fontFamily: "var(--font-display)" }} className="subheading-neon text-lg font-medium text-zinc-50">{item.title}</h3>
+                <p className="mt-2 text-sm leading-6 text-zinc-400">{item.body}</p>
+              </div>
+            ))}
+          </div>
+          <div className="mt-10 flex flex-col gap-3 sm:flex-row">
+            <a href="https://play.google.com/store/apps/details?id=com.spkezz.app&pli=1" target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center gap-2 rounded-full bg-violet-500 px-6 py-3.5 text-sm font-semibold text-white transition-colors hover:bg-violet-400 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-violet-500">
+              <span aria-hidden="true" className="h-5 w-5 bg-contain bg-center bg-no-repeat" style={{ backgroundImage: "url('https://cdn.simpleicons.org/googleplay/ffffff')" }} />
+              Get it on Google Play
+            </a>
+            <a href="https://apps.apple.com/gb/app/spkez/id6763252365" target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center gap-2 rounded-full border border-violet-500/50 px-6 py-3.5 text-sm font-semibold text-violet-200 transition-colors hover:border-violet-400 hover:text-white focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-violet-500">
+              <span aria-hidden="true" className="h-5 w-5 bg-contain bg-center bg-no-repeat" style={{ backgroundImage: "url('https://cdn.simpleicons.org/appstore/ffffff')" }} />
+              Download on the App Store
+            </a>
+          </div>
+        </div>
+      </section>
+      )}
+
+      {showGetApp && (
+      <div role="dialog" aria-modal="true" aria-labelledby="get-app-title" className="fixed inset-0 z-50 grid place-items-center bg-black/70 px-6 backdrop-blur-sm" onClick={() => setShowGetApp(false)}>
+        <div className="w-full max-w-md rounded-2xl border border-violet-500/40 bg-[#0b0f18] p-8 shadow-2xl shadow-black/60" onClick={(event) => event.stopPropagation()}>
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <p style={{ fontFamily: "var(--font-mono)" }} className="text-xs uppercase tracking-wider text-violet-300">Get the app</p>
+              <h2 id="get-app-title" style={{ fontFamily: "var(--font-display)" }} className="heading-neon mt-2 text-2xl font-medium tracking-tight text-zinc-50">
+                Download SpeakEZ
+              </h2>
+            </div>
+            <button type="button" aria-label="Close download options" className="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-white/15 text-xl text-zinc-100 transition-colors hover:border-violet-400 hover:text-violet-300 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-violet-500" onClick={() => setShowGetApp(false)}>&times;</button>
+          </div>
+          <p className="mt-3 text-sm text-zinc-400">Available on the platforms below.</p>
+          <div className="mt-6 flex flex-col gap-3">
+            <a
+              href="https://play.google.com/store/apps/details?id=com.spkezz.app&pli=1"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center gap-2 rounded-full bg-violet-500 px-6 py-3.5 text-sm font-semibold text-white transition-colors hover:bg-violet-400 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-violet-500"
+            >
+              <span aria-hidden="true" className="h-5 w-5 bg-contain bg-center bg-no-repeat" style={{ backgroundImage: "url('https://cdn.simpleicons.org/googleplay/ffffff')" }} />
+              Get it on Google Play
+            </a>
+            <a
+              href="https://apps.apple.com/gb/app/spkez/id6763252365"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center gap-2 rounded-full border border-violet-500/50 px-6 py-3.5 text-sm font-semibold text-violet-200 transition-colors hover:border-violet-400 hover:text-white focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-violet-500"
+            >
+              <span aria-hidden="true" className="h-5 w-5 bg-contain bg-center bg-no-repeat" style={{ backgroundImage: "url('https://cdn.simpleicons.org/appstore/ffffff')" }} />
+              Download on the App Store
+            </a>
+          </div>
+        </div>
+      </div>
+      )}
+      </div>
     </div>
   );
 }
