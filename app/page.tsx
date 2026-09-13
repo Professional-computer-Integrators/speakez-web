@@ -3,6 +3,8 @@
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { Space_Grotesk, IBM_Plex_Sans, IBM_Plex_Mono } from "next/font/google";
+import { UseCases } from "./components/UseCases";
+import { BreachGrid } from "./components/BreachGrid";
 
 const display = Space_Grotesk({
   subsets: ["latin"],
@@ -20,50 +22,6 @@ const mono = IBM_Plex_Mono({
   variable: "--font-mono",
 });
 
-function LogoCube() {
-  const faces = [
-    "translateZ(14px)",
-    "rotateY(180deg) translateZ(14px)",
-    "rotateY(-90deg) translateZ(14px)",
-    "rotateY(90deg) translateZ(14px)",
-    "rotateX(90deg) translateZ(14px)",
-    "rotateX(-90deg) translateZ(14px)",
-  ];
-
-  return (
-    <div style={{ perspective: "224px" }} aria-hidden="true">
-      <div
-        style={{
-          width: 29,
-          height: 29,
-          position: "relative",
-          transformStyle: "preserve-3d",
-          animation: "hv-cube-rotate 8s linear infinite",
-          willChange: "transform",
-        }}
-      >
-        {faces.map((transform) => (
-          <div
-            key={transform}
-            style={{
-              position: "absolute",
-              width: 29,
-              height: 29,
-              overflow: "hidden",
-              border: "1px solid rgba(0,212,255,0.5)",
-              background: "#06101e",
-              transform,
-              backfaceVisibility: "hidden",
-            }}
-          >
-            <Image src="/icon-512x512.png" alt="" fill sizes="29px" className="object-cover" />
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
 type HeroPreview = {
   title: string;
   description: string;
@@ -74,11 +32,11 @@ type HeroPreview = {
 
 const heroPreviews = {
   box: {
-    title: "The SpeakEZ server",
+    title: "SpeakEZ On-Prem",
     description: "Open the hardware details",
     href: "#hardware",
     imageSrc: "/intel-nuc-transparent.png",
-    imageAlt: "SpeakEZ server mini PC",
+    imageAlt: "SpeakEZ On-Prem server mini PC",
   },
   phone: {
     title: "SpeakEZ on your phone",
@@ -90,11 +48,10 @@ const heroPreviews = {
 } satisfies Record<string, HeroPreview>;
 
 const salesHeadlines = [
-  "Your messages. Your server. Your rules.",
   "Private messaging without surrendering your data.",
   "Own the conversation. Keep it encrypted.",
-  "Self-hosted security that stays with you.",
-  "Speak freely. Keep it local.",
+  "Run your own network. Keep it local.",
+  "Speak freely. Keep it private.",
 ];
 
 export default function Home() {
@@ -104,6 +61,8 @@ export default function Home() {
   const [showHowItWorks, setShowHowItWorks] = useState(false);
   const [showHardware, setShowHardware] = useState(false);
   const [showBenefits, setShowBenefits] = useState(false);
+  const [showUseCases, setShowUseCases] = useState(false);
+  const [showPrivacy, setShowPrivacy] = useState(false);
   const [showAboutApp, setShowAboutApp] = useState(false);
   const [showWhyApp, setShowWhyApp] = useState(false);
   const [showGetApp, setShowGetApp] = useState(false);
@@ -131,12 +90,15 @@ export default function Home() {
     setShowHowItWorks(false);
     setShowHardware(false);
     setShowBenefits(false);
+    setShowUseCases(false);
+    setShowPrivacy(false);
     setShowAboutApp(false);
     setShowWhyApp(false);
     setShowGetApp(false);
   };
 
-  const anyModalOpen = showHowItWorks || showHardware || showBenefits || showAboutApp || showWhyApp;
+  const anyModalOpen =
+    showHowItWorks || showHardware || showBenefits || showUseCases || showPrivacy || showAboutApp || showWhyApp;
 
   useEffect(() => {
     const intervalId = setInterval(() => {
@@ -231,7 +193,6 @@ export default function Home() {
       {/* Header */}
       <header className="mx-auto flex max-w-6xl items-center justify-between px-6 py-6 sm:px-10">
         <div className="flex items-center gap-2">
-          <LogoCube />
           <span style={{ fontFamily: "var(--font-display)" }} className="text-lg font-medium tracking-tight">
             SpeakEZ
           </span>
@@ -257,7 +218,7 @@ export default function Home() {
               onClick={() => setOpenMenu((menu) => (menu === "self-host" ? null : "self-host"))}
               className="nav-neon flex items-center gap-1 rounded-sm hover:text-violet-200 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-violet-500"
             >
-              Self-host
+              On-Prem
               <span aria-hidden="true" className="text-[0.6rem]">&#9662;</span>
             </button>
             {openMenu === "self-host" && (
@@ -267,10 +228,16 @@ export default function Home() {
                     <button type="button" onClick={() => { setOpenMenu(null); closeAllModals(); setShowHowItWorks(true); }} className="block w-full px-4 py-2.5 text-left text-white transition-colors hover:bg-violet-500/15 hover:text-violet-200">How it works</button>
                   </li>
                   <li>
+                    <button type="button" onClick={() => { setOpenMenu(null); closeAllModals(); setShowUseCases(true); }} className="block w-full px-4 py-2.5 text-left text-white transition-colors hover:bg-violet-500/15 hover:text-violet-200">Use cases</button>
+                  </li>
+                  <li>
+                    <button type="button" onClick={() => { setOpenMenu(null); closeAllModals(); setShowPrivacy(true); }} className="block w-full px-4 py-2.5 text-left text-white transition-colors hover:bg-violet-500/15 hover:text-violet-200">Privacy</button>
+                  </li>
+                  <li>
                     <button type="button" onClick={() => { setOpenMenu(null); closeAllModals(); setShowHardware(true); }} className="block w-full px-4 py-2.5 text-left text-white transition-colors hover:bg-violet-500/15 hover:text-violet-200">Hardware</button>
                   </li>
                   <li>
-                    <button type="button" onClick={() => { setOpenMenu(null); closeAllModals(); setShowBenefits(true); }} className="block w-full px-4 py-2.5 text-left text-white transition-colors hover:bg-violet-500/15 hover:text-violet-200">Why self-host</button>
+                    <button type="button" onClick={() => { setOpenMenu(null); closeAllModals(); setShowBenefits(true); }} className="block w-full px-4 py-2.5 text-left text-white transition-colors hover:bg-violet-500/15 hover:text-violet-200">Why On-Prem</button>
                   </li>
                 </ol>
               </div>
@@ -366,7 +333,7 @@ export default function Home() {
         />
         <button
           type="button"
-          aria-label="Preview the SpeakEZ server box in the background"
+          aria-label="Preview the SpeakEZ On-Prem box in the background"
           aria-expanded={activePreview === heroPreviews.box}
           className="pointer-events-auto absolute left-[44%] top-[46%] h-[9%] w-[12%] rounded-xl focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#4FD1C5]"
           onMouseEnter={() => showPreviewAfterDelay(heroPreviews.box)}
@@ -470,6 +437,81 @@ export default function Home() {
         </section>
       )}
 
+      {showUseCases && (
+        <section
+          id="use-cases"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="use-cases-title"
+          className="dropdown-page fixed inset-0 z-40 overflow-y-auto px-6 py-16 text-[#E7ECEF] sm:px-10"
+        >
+          <div className="mx-auto max-w-5xl">
+            <div className="flex items-start justify-between gap-6">
+              <div>
+                <p style={{ fontFamily: "var(--font-mono)" }} className="text-xs uppercase tracking-wider text-violet-300">On-Prem deployments</p>
+                <h2 id="use-cases-title" style={{ fontFamily: "var(--font-display)" }} className="heading-neon mt-3 text-2xl font-medium tracking-tight text-zinc-50 sm:text-3xl">
+                  Built for the conversations that can&apos;t leak
+                </h2>
+              </div>
+              <button
+                type="button"
+                aria-label="Close use cases"
+                className="grid h-10 w-10 shrink-0 place-items-center rounded-full border border-white/15 text-xl text-zinc-100 transition-colors hover:border-violet-400 hover:text-violet-300 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-violet-500"
+                onClick={() => setShowUseCases(false)}
+              >
+                &times;
+              </button>
+            </div>
+            <p className="mt-4 max-w-2xl text-zinc-300">
+              With SpeakEZ On-Prem, your organization runs its own private node instead of using our
+              shared network. Different teams reach for that for the same underlying reason: the cost
+              of a conversation getting out is too high to route through infrastructure they don&apos;t control.
+            </p>
+            <div className="mt-10">
+              <UseCases />
+            </div>
+          </div>
+        </section>
+      )}
+
+      {showPrivacy && (
+        <section
+          id="privacy"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="privacy-title"
+          className="dropdown-page fixed inset-0 z-40 overflow-y-auto px-6 py-16 text-[#E7ECEF] sm:px-10"
+        >
+          <div className="mx-auto max-w-5xl">
+            <div className="flex items-start justify-between gap-6">
+              <div>
+                <p style={{ fontFamily: "var(--font-mono)" }} className="text-xs uppercase tracking-wider text-violet-300">The privacy case</p>
+                <h2 id="privacy-title" style={{ fontFamily: "var(--font-display)" }} className="heading-neon mt-3 text-2xl font-medium tracking-tight text-zinc-50 sm:text-3xl">
+                  What On-Prem takes off the table
+                </h2>
+              </div>
+              <button
+                type="button"
+                aria-label="Close privacy details"
+                className="grid h-10 w-10 shrink-0 place-items-center rounded-full border border-white/15 text-xl text-zinc-100 transition-colors hover:border-violet-400 hover:text-violet-300 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-violet-500"
+                onClick={() => setShowPrivacy(false)}
+              >
+                &times;
+              </button>
+            </div>
+            <p className="mt-4 max-w-2xl text-zinc-300">
+              Every SpeakEZ message is end-to-end encrypted, on our shared network or yours. Running
+              your own private node on On-Prem additionally keeps the encrypted traffic itself off our
+              shared infrastructure, so there's no shared relay, and no shared network logs, in the path
+              at all.
+            </p>
+            <div className="mt-10">
+              <BreachGrid />
+            </div>
+          </div>
+        </section>
+      )}
+
       {showHardware && (
       <section id="hardware" role="dialog" aria-modal="true" aria-labelledby="hardware-title" className="dropdown-page fixed inset-0 z-40 overflow-y-auto px-6 py-16 text-[#E7ECEF] sm:px-10">
         <div className="mx-auto max-w-5xl">
@@ -483,7 +525,7 @@ export default function Home() {
           <button type="button" aria-label="Close hardware" className="grid h-10 w-10 shrink-0 place-items-center rounded-full border border-white/15 text-xl text-zinc-100 transition-colors hover:border-violet-400 hover:text-violet-300 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-violet-500" onClick={() => setShowHardware(false)}>&times;</button>
         </div>
         <p className="mt-4 max-w-2xl text-zinc-400">
-          SpeakEZ&apos;s server is light enough to run on a small mini PC tucked into
+          SpeakEZ On-Prem runs a private IPFS/Kubo node light enough for a small mini PC tucked into
           a cupboard — no rack, no dedicated IT room required.
         </p>
         <div className="mt-10 grid gap-6 sm:grid-cols-2">
@@ -505,7 +547,7 @@ export default function Home() {
           </div>
           <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-6">
             <Image
-              src="/book-pc.webp"
+              src="/intel-nuc-transparent.png"
               alt="Mini PC with a modern processor"
               width={300}
               height={300}
@@ -529,30 +571,30 @@ export default function Home() {
         <div className="mx-auto max-w-5xl">
         <div className="flex items-start justify-between gap-6">
           <div>
-            <p style={{ fontFamily: "var(--font-mono)" }} className="text-xs uppercase tracking-wider text-violet-300">Self-hosting</p>
+            <p style={{ fontFamily: "var(--font-mono)" }} className="text-xs uppercase tracking-wider text-violet-300">On-Prem</p>
         <h2 style={{ fontFamily: "var(--font-display)" }} className="heading-neon text-2xl font-medium tracking-tight text-zinc-50 sm:text-3xl">
-          Why organizations run it themselves
+          Why organizations run their own node
         </h2>
           </div>
-          <button type="button" aria-label="Close self-hosting details" className="grid h-10 w-10 shrink-0 place-items-center rounded-full border border-white/15 text-xl text-zinc-100 transition-colors hover:border-violet-400 hover:text-violet-300 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-violet-500" onClick={() => setShowBenefits(false)}>&times;</button>
+          <button type="button" aria-label="Close On-Prem details" className="grid h-10 w-10 shrink-0 place-items-center rounded-full border border-white/15 text-xl text-zinc-100 transition-colors hover:border-violet-400 hover:text-violet-300 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-violet-500" onClick={() => setShowBenefits(false)}>&times;</button>
         </div>
         <div className="mt-10 grid gap-8 sm:grid-cols-2">
           {[
             {
-              title: "Your data stays on your premises",
-              body: "Messages, files, and calls never leave your network. There's no external server for anyone to subpoena, breach, or shut down.",
+              title: "Your traffic stays off our shared network",
+              body: "With your own private Kubo/IPFS node, encrypted messages relay through infrastructure only your organization operates — not our shared cluster.",
             },
             {
-              title: "Works without an internet connection",
-              body: "Since devices talk directly to the box on your local network, the team can keep messaging even if the building's internet goes down.",
+              title: "No shared network logs",
+              body: "Our shared network keeps brief access logs for abuse prevention. Run your own node, and those logs simply don't exist outside your own infrastructure.",
             },
             {
               title: "One box, every device",
-              body: "Phones, laptops, and tablets across the organization all connect to the same server — no per-seat cloud accounts to manage.",
+              body: "Phones, laptops, and tablets across the organization all connect to the same node — no per-seat cloud accounts to manage.",
             },
             {
               title: "Still end-to-end encrypted",
-              body: "Running your own server doesn't relax the encryption. Every message is encrypted on-device, the same as SpeakEZ's public app.",
+              body: "Running your own node doesn't change the encryption. Every message is encrypted on-device before it ever reaches the network, on-prem or hosted.",
             },
           ].map((b) => (
             <div key={b.title} className="border-t border-white/10 pt-6">
@@ -581,7 +623,7 @@ export default function Home() {
           </div>
           <p className="mt-4 max-w-2xl text-zinc-400">
             The SpeakEZ app puts encrypted messaging, voice, and file sharing in your
-            pocket — pairing with your self-hosted server or the public SpeakEZ service
+            pocket — pairing with your own On-Prem node or our shared network
             without any complicated onboarding.
           </p>
           <div className="mt-10 grid gap-8 sm:grid-cols-3">
@@ -596,7 +638,7 @@ export default function Home() {
               },
               {
                 title: "Every platform",
-                body: "Native Android and iOS apps that connect straight to your box, ready to use from the first minute.",
+                body: "Native Android and iOS apps that connect straight to your node, ready to use from the first minute.",
               },
             ].map((item) => (
               <div key={item.title} className="rounded-lg border border-white/10 bg-white/[0.03] p-6">
@@ -635,19 +677,19 @@ export default function Home() {
             {[
               {
                 title: "You are the customer, not the product",
-                body: "Mainstream apps monetise your data. SpeakEZ doesn't — no ad targeting, no behavioural inventory, no selling of your conversations.",
+                body: "SpeakEZ doesn't run ad targeting or behavioural profiling, and doesn't sell your conversations — on our shared network or yours.",
               },
               {
-                title: "Talks to your own server",
-                body: "The app pairs directly with your self-hosted box, so messages, calls, and files stay inside your network end to end.",
+                title: "Talks to your own node, if you choose",
+                body: "The app pairs directly with an On-Prem node when you run one, so messages, calls, and files relay only through infrastructure you control.",
               },
               {
                 title: "Encrypted everywhere",
-                body: "Every message is encrypted on the device before it leaves, the same standard whether you self-host or use the public service.",
+                body: "Every message is encrypted on the device before it leaves, the same standard whether you run On-Prem or use our shared network.",
               },
               {
                 title: "Simple enough for anyone",
-                body: "No technical setup, no consultancy phase. Install it, pair it, and start communicating securely straight away.",
+                body: "No technical setup for most users, no consultancy phase. Install it, pair it, and start communicating securely straight away.",
               },
             ].map((item) => (
               <div key={item.title} className="border-t border-white/10 pt-6">
