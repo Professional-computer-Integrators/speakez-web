@@ -525,7 +525,7 @@ export default function Home() {
           <button type="button" aria-label="Close hardware" className="grid h-10 w-10 shrink-0 place-items-center rounded-full border border-white/15 text-xl text-zinc-100 transition-colors hover:border-violet-400 hover:text-violet-300 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-violet-500" onClick={() => setShowHardware(false)}>&times;</button>
         </div>
         <p className="mt-4 max-w-2xl text-zinc-400">
-          SpeakEZ On-Prem runs a private IPFS/Kubo node light enough for a small mini PC tucked into
+          SpeakEZ On-Prem runs a private node light enough for a small mini PC tucked into
           a cupboard — no rack, no dedicated IT room required.
         </p>
         <div className="mt-10 grid gap-6 sm:grid-cols-2">
@@ -582,7 +582,7 @@ export default function Home() {
           {[
             {
               title: "Your traffic stays off our shared network",
-              body: "With your own private Kubo/IPFS node, encrypted messages relay through infrastructure only your organization operates — not our shared cluster.",
+              body: "With your own private node, encrypted messages relay through infrastructure only your organization operates — not our shared cluster.",
             },
             {
               title: "No shared network logs",
